@@ -1,65 +1,43 @@
+#include "ProcessManager.h"
 #include <iostream>
-#include <string>
 
-enum class ProcessState {
-    NEW, RUNNING, WAITING, READY, TERMINATED
-};
+// Constructor implementation
+Process::Process(int id, int prio) : pid(id), state(ProcessState::NEW), cpuTime(0), priority(prio) {}
 
-class Process {
-private:
-    int pid;
-    ProcessState state;
-    int cpuTime; // Simulated CPU time in "ticks"
-    int priority; // Lower numbers indicate higher priority
+// Getters implementation
+int Process::getPid() const { return pid; }
+ProcessState Process::getState() const { return state; }
+int Process::getCpuTime() const { return cpuTime; }
+int Process::getPriority() const { return priority; }
 
-public:
-    Process(int id, int prio = 0) : pid(id), priority(prio), state(ProcessState::NEW), cpuTime(0) {}
+// Setters implementation
+void Process::setState(ProcessState newState) { state = newState; }
+void Process::setCpuTime(int time) { cpuTime = time; }
+void Process::setPriority(int prio) { priority = prio; }
 
-    // Getters
-    int getPid() const { return pid; }
-    ProcessState getState() const { return state; }
-    int getCpuTime() const { return cpuTime; }
-    int getPriority() const { return priority; }
-
-    // Setters
-    void setState(ProcessState newState) { state = newState; }
-    void setCpuTime(int time) { cpuTime = time; }
-    void setPriority(int prio) { priority = prio; }
-
-    // Basic process controls
-    void start() {
-        if (state == ProcessState::NEW || state == ProcessState::READY) {
-            state = ProcessState::RUNNING;
-            std::cout << "Process " << pid << " started." << std::endl;
-        }
+// Process methods implementation
+void Process::start() {
+    if (state == ProcessState::NEW || state == ProcessState::READY) {
+        state = ProcessState::RUNNING;
+        std::cout << "Process " << pid << " started." << std::endl;
     }
+}
 
-    void stop() {
-        if (state == ProcessState::RUNNING) {
-            state = ProcessState::WAITING;
-            std::cout << "Process " << pid << " stopped." << std::endl;
-        }
+void Process::stop() {
+    if (state == ProcessState::RUNNING) {
+        state = ProcessState::WAITING;
+        std::cout << "Process " << pid << " stopped." << std::endl;
     }
+}
 
-    void terminate() {
-        state = ProcessState::TERMINATED;
-        std::cout << "Process " << pid << " terminated." << std::endl;
+void Process::terminate() {
+    state = ProcessState::TERMINATED;
+    std::cout << "Process " << pid << " terminated." << std::endl;
+}
+
+void Process::update(int cpuCycle) {
+    if (state == ProcessState::RUNNING) {
+        cpuTime += cpuCycle;
+        std::cout << "Process " << pid << " ran for " << cpuCycle << " cycles." << std::endl;
     }
-
-    void update(int cpuCycle) {
-        if (state == ProcessState::RUNNING) {
-            cpuTime += cpuCycle;
-            std::cout << "Process " << pid << " ran for " << cpuCycle << " cycles." << std::endl;
-        }
-    }
-};
-
-int main() {
-    Process proc1(1, 5); // Create a process with PID 1 and priority 5
-    proc1.start();
-    proc1.update(10); // Simulate that the process has run for 10 ticks
-    proc1.stop();
-    proc1.terminate();
-
-    return 0;
 }
